@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { Home, MessageSquare, FileText, IdCard, Settings } from "lucide-react";
+import { Home, MessageSquare, FileText, IdCard, Settings, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import HomePage from "./HomePage";
 import FeedbackPage from "./FeedbackPage";
@@ -19,6 +25,8 @@ const MainLayout = () => {
     { id: "travel-id", label: "Travel ID", icon: IdCard },
     { id: "settings", label: "Settings", icon: Settings },
   ];
+
+  const currentPageItem = navigation.find(item => item.id === currentPage);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -54,28 +62,47 @@ const MainLayout = () => {
         {renderPage()}
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation Dropdown */}
       <nav className="bg-card border-t border-border">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-around py-2">
-            {navigation.map((item) => (
-              <Button
-                key={item.id}
-                variant="ghost"
-                size="sm"
-                onClick={() => setCurrentPage(item.id as Page)}
-                className={cn(
-                  "flex-col gap-1 h-auto py-2 px-3 text-xs",
-                  currentPage === item.id
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center justify-between bg-background hover:bg-accent"
               >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-2">
+                  {currentPageItem && (
+                    <>
+                      <currentPageItem.icon className="h-4 w-4" />
+                      <span>{currentPageItem.label}</span>
+                    </>
+                  )}
+                </div>
+                <ChevronUp className="h-4 w-4" />
               </Button>
-            ))}
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              side="top" 
+              className="w-56 bg-popover border border-border shadow-lg z-50"
+            >
+              {navigation.map((item) => (
+                <DropdownMenuItem
+                  key={item.id}
+                  onClick={() => setCurrentPage(item.id as Page)}
+                  className={cn(
+                    "flex items-center gap-2 cursor-pointer",
+                    currentPage === item.id
+                      ? "bg-primary/10 text-primary"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
     </div>
