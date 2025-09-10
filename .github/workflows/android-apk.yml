@@ -1,0 +1,66 @@
+name: Build Android APK (Capacitor)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Capacitor CLI
+        run: npm i -D @capacitor/cli @capacitor/core
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Create Capacitor config
+        run: |
+          node -e "const fs=require('fs');
+          const cfg={
+            appId:'com.journeysafeguard.app',
+            appName:'journey-safe-guard',
+            webDir:'dist',
+            server:{
+              androidScheme:'https'
+            }
+          };
+          fs.writeFileSync('capacitor.config.json', JSON.stringify(cfg, null, 2));"
+
+      - name: Add Android platform
+        run: npx cap add android --yes
+
+      - name: Sync Capacitor
+        run: npx cap sync android --yes
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: journey-safe-guard-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+
+
