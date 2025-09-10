@@ -1,12 +1,26 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import AuthPage from "@/components/AuthPage";
+import UserProfileForm from "@/components/UserProfileForm";
+import MainLayout from "@/components/MainLayout";
+
+type AppState = "auth" | "profile" | "main";
 
 const Index = () => {
+  const [currentState, setCurrentState] = useState<AppState>("auth");
+
+  const handleAuth = () => {
+    setCurrentState("profile");
+  };
+
+  const handleProfileComplete = () => {
+    setCurrentState("main");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen">
+      {currentState === "auth" && <AuthPage onAuth={handleAuth} />}
+      {currentState === "profile" && <UserProfileForm onComplete={handleProfileComplete} />}
+      {currentState === "main" && <MainLayout />}
     </div>
   );
 };
