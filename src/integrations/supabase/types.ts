@@ -215,6 +215,75 @@ export type Database = {
         }
         Relationships: []
       }
+      tourists: {
+        Row: {
+          aadhaar_number: string | null
+          citizenship: string
+          created_at: string
+          current_lat: number | null
+          current_lng: number | null
+          emergency_contact: string
+          entry_point: string
+          id: string
+          is_active: boolean | null
+          is_tracked: boolean | null
+          name: string
+          passport_number: string | null
+          phone: string
+          purpose: string
+          risk_level: string | null
+          safety_score: number | null
+          tourist_id: string
+          trip_end_date: string
+          trip_start_date: string
+          updated_at: string
+        }
+        Insert: {
+          aadhaar_number?: string | null
+          citizenship: string
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          emergency_contact: string
+          entry_point: string
+          id?: string
+          is_active?: boolean | null
+          is_tracked?: boolean | null
+          name: string
+          passport_number?: string | null
+          phone: string
+          purpose: string
+          risk_level?: string | null
+          safety_score?: number | null
+          tourist_id: string
+          trip_end_date: string
+          trip_start_date: string
+          updated_at?: string
+        }
+        Update: {
+          aadhaar_number?: string | null
+          citizenship?: string
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          emergency_contact?: string
+          entry_point?: string
+          id?: string
+          is_active?: boolean | null
+          is_tracked?: boolean | null
+          name?: string
+          passport_number?: string | null
+          phone?: string
+          purpose?: string
+          risk_level?: string | null
+          safety_score?: number | null
+          tourist_id?: string
+          trip_end_date?: string
+          trip_start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
