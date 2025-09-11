@@ -43,32 +43,64 @@ Deno.serve(async (req) => {
       }
     })
 
-    // Create user accounts
+    // Create user accounts with proper confirmation
     const results = []
     for (const cred of touristCredentials) {
       try {
         const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
           email: cred.email,
           password: cred.password,
-          email_confirm: true, // Skip email confirmation
+          email_confirm: true, // This confirms the email immediately
           user_metadata: {
             tourist_id: cred.tourist_id,
-            name: cred.name
+            name: cred.name,
+            full_name: cred.name
           }
         })
 
         if (authError) {
-          console.error(`Failed to create account for ${cred.name}:`, authError)
-          results.push({
-            ...cred,
-            success: false,
-            error: authError.message
-          })
+          // Check if user already exists
+          if (authError.message.includes('already been registered')) {
+            // Try to get existing user and update password
+            const { data: existingUser, error: getUserError } = await supabaseClient.auth.admin.getUserById(cred.tourist_id)
+            
+            if (!getUserError && existingUser) {
+              // Update password for existing user
+              const { data: updateData, error: updateError } = await supabaseClient.auth.admin.updateUserById(
+                existingUser.user.id,
+                { 
+                  password: cred.password,
+                  email_confirm: true
+                }
+              )
+              
+              results.push({
+                ...cred,
+                success: true,
+                user_id: existingUser.user.id,
+                action: 'updated'
+              })
+            } else {
+              results.push({
+                ...cred,
+                success: false,
+                error: authError.message
+              })
+            }
+          } else {
+            console.error(`Failed to create account for ${cred.name}:`, authError)
+            results.push({
+              ...cred,
+              success: false,
+              error: authError.message
+            })
+          }
         } else {
           results.push({
             ...cred,
             success: true,
-            user_id: authData.user?.id
+            user_id: authData.user?.id,
+            action: 'created'
           })
         }
       } catch (error) {
@@ -83,9 +115,14 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        message: 'Tourist accounts creation completed',
+        message: 'Tourist accounts processing completed',
         results,
-        credentials: touristCredentials
+        credentials: touristCredentials,
+        summary: {
+          total: results.length,
+          successful: results.filter(r => r.success).length,
+          failed: results.filter(r => !r.success).length
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

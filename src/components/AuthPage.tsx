@@ -111,6 +111,16 @@ const AuthPage = ({ onAuth }: { onAuth: () => void }) => {
           <p className="text-white/80">Your digital travel companion</p>
         </div>
 
+        {/* Tourist Login Hint */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-white/90 text-xs">
+          <p className="font-medium mb-2">Test with Tourist Accounts:</p>
+          <div className="space-y-1">
+            <div>📧 john.smith@travelsafe.com</div>
+            <div>🔑 American2024!</div>
+          </div>
+          <p className="mt-2 text-white/70">Or try: priya.patel@travelsafe.com / Indian2024!</p>
+        </div>
+
         {/* Features Preview */}
         <div className="grid grid-cols-3 gap-2 text-white/80 text-xs">
           <div className="text-center">

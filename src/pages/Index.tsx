@@ -69,9 +69,10 @@ const Index = () => {
       } else {
         toast({
           title: "Success!",
-          description: "Tourist accounts created successfully. Check console for credentials.",
+          description: `Created ${data.summary?.successful || 0} accounts. Check console for credentials.`,
         });
         console.log("Tourist credentials:", data.credentials);
+        console.log("Summary:", data.summary);
       }
     } catch (error) {
       toast({
@@ -79,6 +80,39 @@ const Index = () => {
         description: "Failed to create tourist accounts.",
         variant: "destructive",
       });
+    }
+  };
+
+  const quickLoginTest = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'john.smith@travelsafe.com',
+        password: 'American2024!',
+      });
+
+      if (error) {
+        toast({
+          title: "Test Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        console.log("Login error:", error);
+      } else {
+        toast({
+          title: "Test Login Success!",
+          description: "John Smith account working.",
+        });
+        console.log("Login success:", data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Login test failed.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,12 +132,20 @@ const Index = () => {
       {currentState === "auth" && (
         <div>
           <AuthPage onAuth={handleAuth} />
-          <div className="fixed top-4 right-4">
+          <div className="fixed top-4 right-4 space-y-2">
             <Button 
               onClick={createTouristAccounts}
-              className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 block w-full"
+              disabled={loading}
             >
               Create Tourist Accounts
+            </Button>
+            <Button 
+              onClick={quickLoginTest}
+              className="bg-accent text-accent-foreground hover:bg-accent/90 block w-full"
+              disabled={loading}
+            >
+              Test Login (John Smith)
             </Button>
           </div>
         </div>
